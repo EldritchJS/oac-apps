@@ -1,0 +1,24 @@
+# A new class: mountOptions is immutable, so a cleartext class cannot be
+# upgraded in place. Volumes move to this one to gain encryption in transit.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageClass.name }}
+  annotations:
+    description: >-
+      NFS over TLS (RFC 9289). Requires the tlshd DaemonSet in the nfs-tls
+      namespace. See
+      https://github.com/EldritchJS/oac-eldritch-things/blob/main/compliance/NFS-TLS.md
+    {{- if .Values.storageClass.default }}
+    storageclass.kubernetes.io/is-default-class: "true"
+    {{- end }}
+provisioner: pxd.portworx.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+mountOptions:
+  - xprtsec=tls
+parameters:
+  backend: pure_file
+  pure_nfs_policy: {{ required "storageClass.nfsPolicy is required" .Values.storageClass.nfsPolicy }}
+  pure_nfs_server: {{ required "storageClass.nfsServer is required" .Values.storageClass.nfsServer }}

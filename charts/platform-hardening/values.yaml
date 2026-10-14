@@ -1,0 +1,33 @@
+# Registry allowlist: closes ocp4 allowed-registries,
+# allowed-registries-for-import and reject-unsigned-images-by-default.
+# The last one only checks that policy.json defaults to reject; pulls are
+# restricted by REGISTRY, not verified by signature (outside the release
+# payload). Say so in the SSP.
+#
+# There is no default list on purpose. A registry missing from it means
+# ImagePullBackOff on the next pull, so build the list from an inventory of
+# every image reference on the cluster. Running pods are not enough: also
+# check scaled-down workloads, CronJobs, CatalogSources, CSV relatedImages,
+# ImageStreams and BuildConfig bases.
+#
+# Hosted clusters: leave this off. Their image config is
+# HostedCluster.spec.configuration.image on the hub (hosted-cluster chart).
+imageConfig:
+  enabled: false
+  allowedRegistries: []
+  allowedRegistriesForImport: []
+
+# System use notification (800-53 AC-8): closes banner-or-login-template-set
+# and openshift-motd-exists. The wording must come from the organisation's
+# legal or compliance office and match every other login point; there is no
+# default. The check looks for a ConsoleNotification with exactly this
+# name, so do not rename it.
+systemUseNotice:
+  enabled: false
+  bannerName: classification-banner
+  # One line, shown at the top of the console.
+  banner: ""
+  color: "#ffffff"
+  backgroundColor: "#8a1c1c"
+  # Full text, shown by `oc login`.
+  motd: ""

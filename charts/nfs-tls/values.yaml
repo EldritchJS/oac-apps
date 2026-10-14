@@ -1,0 +1,46 @@
+# NFS over TLS (RFC 9289) for Portworx-provisioned FlashBlade volumes.
+# The kernel does the TLS record layer; tlshd answers its handshake upcall.
+# Without tlshd on a node, mounts with xprtsec=tls fail there with
+# "mount.nfs: No such process". Background:
+# https://github.com/EldritchJS/oac-eldritch-things/blob/main/compliance/NFS-TLS.md
+# Adapted from https://github.com/larsks/tlshd (branch rhel9.6).
+namespace: nfs-tls
+
+image:
+  # Pin by digest. The image (UBI 9 plus RHEL's ktls-utils) is built
+  # outside this chart; pull one published, scanned image rather than
+  # building per cluster.
+  repository: ""
+  digest: ""
+imagePullSecrets: []
+
+# Trust anchor for the storage server's TLS certificate. Exactly one of:
+#   inline:            PEM text; this chart creates the ConfigMap.
+#   existingConfigMap: a ConfigMap already in the namespace (any *.crt keys).
+#   externalSecret:    pull the PEM from the secret store into a Secret.
+# The FlashBlade certificate names the data VIP, so it does not belong in a
+# public repo: prefer externalSecret.
+ca:
+  inline: ""
+  existingConfigMap: ""
+  externalSecret:
+    secretStore: aws-secrets-manager
+    remoteKey: ""
+    property: ""
+
+storageClass:
+  name: nfs-over-tls
+  default: false
+  # The TLS export policy and server name on the FlashBlade. These are NOT
+  # the cleartext ones: a class pointing at a cleartext export with
+  # xprtsec=tls fails every mount.
+  nfsPolicy: ""
+  nfsServer: ""
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi

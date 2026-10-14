@@ -1,0 +1,5 @@
+apiVersion: v2
+name: nfs-tls
+description: tlshd handshake daemon and an NFS-over-TLS StorageClass for Pure FlashBlade
+version: 0.1.0
+type: application
