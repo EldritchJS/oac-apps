@@ -11,6 +11,13 @@ metadata:
 spec:
   arch: {{ .arch | default "amd64" }}
   clusterName: {{ $clusterName }}
+  {{- $config := concat $.Values.nodePoolConfig (.config | default list) | uniq }}
+  {{- with $config }}
+  config:
+    {{- range . }}
+    - name: {{ . }}
+    {{- end }}
+  {{- end }}
   management:
     autoRepair: {{ .autoRepair | default false }}
     upgradeType: {{ .upgradeType | default "InPlace" }}

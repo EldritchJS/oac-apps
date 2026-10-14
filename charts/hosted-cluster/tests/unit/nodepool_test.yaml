@@ -97,3 +97,28 @@ tests:
       - equal:
           path: spec.management.upgradeType
           value: Replace
+
+  - it: should omit spec.config by default
+    set:
+      nodePools:
+        - name: compute
+          replicas: 1
+          agentLabelSelector: {role: worker}
+    asserts:
+      - notExists:
+          path: spec.config
+
+  - it: should put nodePoolConfig ahead of the pool's own config, without duplicates
+    set:
+      nodePoolConfig: [compliance-node-hardening]
+      nodePools:
+        - name: compute
+          replicas: 1
+          agentLabelSelector: {role: worker}
+          config: [gpu-kernel-args, compliance-node-hardening]
+    asserts:
+      - equal:
+          path: spec.config
+          value:
+            - name: compliance-node-hardening
+            - name: gpu-kernel-args
