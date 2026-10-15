@@ -1,0 +1,23 @@
+# nist-dev-infra (test hub). Stage A: the scanner alone, with no tailoring,
+# to measure a fresh FIPS install before anything is hardened.
+#
+# Compact hub: all three nodes are masters, and the worker pool is empty.
+# Scanning the worker role as well would scan the same nodes twice.
+scanSetting:
+  roles: [master]
+  rawResultStorage:
+    # "" = the default StorageClass. The hub has none until its storage
+    # components sync; the result server stays Pending until then. Set
+    # this when the class is known.
+    storageClassName: ""
+
+bindings:
+  - name: cis-baseline
+    profiles:
+      - name: ocp4-cis
+      - name: ocp4-cis-node
+  - name: nist-moderate
+    profiles:
+      - name: ocp4-moderate
+      - name: ocp4-moderate-node
+      - name: rhcos4-moderate

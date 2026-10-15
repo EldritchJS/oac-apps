@@ -1,0 +1,6 @@
+# nist-dev-infra (test hub). The cli image of the installed release,
+# 4.22.14 (`oc get is cli -n openshift`). Update it on upgrade.
+image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b4e48cec3040a0f18fe5697e128d8deb1c9409c28b6b3249c789f7beaba10fea
+storage:
+  # "" = the default StorageClass; set when the hub has one.
+  storageClassName: ""

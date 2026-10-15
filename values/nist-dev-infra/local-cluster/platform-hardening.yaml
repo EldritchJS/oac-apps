@@ -1,0 +1,15 @@
+# nist-dev-infra (test hub). The notice text is a placeholder for testing;
+# a compliant hub uses text approved by the legal or compliance office.
+systemUseNotice:
+  enabled: true
+  banner: "TEST SYSTEM (nist-dev-infra): authorized use only. Approved notice text pending."
+  motd: |
+    TEST SYSTEM (nist-dev-infra)
+
+    This is a development cluster for compliance testing. Use is limited to
+    authorized users. The approved system use notice is pending.
+
+# Off until the images in use on this hub have been inventoried: a missing
+# registry stops pods from pulling.
+imageConfig:
+  enabled: false
