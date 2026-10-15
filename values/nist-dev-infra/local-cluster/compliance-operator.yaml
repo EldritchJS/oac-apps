@@ -5,11 +5,12 @@
 # Scanning the worker role as well would scan the same nodes twice.
 scanSetting:
   roles: [master]
+  # The hub has no StorageClass yet: Portworx is not configured for it.
+  # Results are still kept as ComplianceCheckResult objects; only the raw
+  # ARF files (evidence archive) are skipped. Turn this back on, with the
+  # class, once storage exists.
   rawResultStorage:
-    # "" = the default StorageClass. The hub has none until its storage
-    # components sync; the result server stays Pending until then. Set
-    # this when the class is known.
-    storageClassName: ""
+    enabled: false
 
 bindings:
   - name: cis-baseline
