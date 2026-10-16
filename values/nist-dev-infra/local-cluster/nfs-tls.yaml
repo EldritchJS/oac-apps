@@ -1,0 +1,15 @@
+# nist-dev-infra (test hub). The image is public on GHCR, so no pull secret.
+image:
+  repository: ghcr.io/eldritchjs/tlshd
+  digest: sha256:f8bcab63ea0cd9bfe28e84e127391c95fe9470d9b5f1cf2f97d87f99cf50e50b
+ca:
+  externalSecret:
+    # The realm certificate from the FlashBlade. Re-running the realm
+    # playbook makes a new one; update this secret when that happens.
+    remoteKey: cluster/nist-dev-infra/nfs-tls-ca
+storageClass:
+  # The realm playbook creates both; the cleartext class uses export-policy.
+  nfsPolicy: export-policy-tls
+  nfsServer: nfs-server
+  # Not the default until a mount over TLS has been shown to work.
+  default: false
