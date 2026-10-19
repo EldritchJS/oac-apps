@@ -26,3 +26,9 @@ nodePool:
   # ConfigMaps every NodePool must list in spec.config. The node hardening
   # one comes from the compliance-node-hardening chart (nodePool.enabled).
   requiredConfig: [compliance-node-hardening]
+
+storage:
+  # FlashBlade StorageClasses and volumes must mount with xprtsec=tls
+  # (templates/storage-tls.yaml). Pair with portworx.tls: true in the hub's
+  # Portworx values, or the Portworx class itself is refused.
+  requireNfsTls: true

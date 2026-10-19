@@ -35,6 +35,8 @@ tests:
         requireSecretEncryption: false
       nodePool:
         requiredConfig: []
+      storage:
+        requireNfsTls: false
     asserts:
       - failedTemplate:
           errorMessage: "compliance-hub-policy: every check is switched off; leave the chart out instead"
@@ -47,3 +49,15 @@ tests:
       - equal:
           path: spec.validationActions
           value: [Warn, Audit]
+
+  - it: should leave out the hosted cluster policy when only the storage check is on
+    set:
+      hostedCluster:
+        requireFips: false
+        auditProfiles: []
+        requireSecretEncryption: false
+      nodePool:
+        requiredConfig: []
+    asserts:
+      - hasDocuments:
+          count: 0

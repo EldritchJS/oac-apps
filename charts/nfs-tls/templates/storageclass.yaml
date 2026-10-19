@@ -1,3 +1,4 @@
+{{- if .Values.storageClass.enabled }}
 # A new class: mountOptions is immutable, so a cleartext class cannot be
 # upgraded in place. Volumes move to this one to gain encryption in transit.
 apiVersion: storage.k8s.io/v1
@@ -22,3 +23,4 @@ parameters:
   backend: pure_file
   pure_nfs_policy: {{ required "storageClass.nfsPolicy is required" .Values.storageClass.nfsPolicy }}
   pure_nfs_server: {{ required "storageClass.nfsServer is required" .Values.storageClass.nfsServer }}
+{{- end }}
