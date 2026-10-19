@@ -11,5 +11,7 @@ storageClass:
   # The realm playbook creates both; the cleartext class uses export-policy.
   nfsPolicy: export-policy-tls
   nfsServer: nfs-server
-  # Not the default until a mount over TLS has been shown to work.
-  default: false
+  # The default, so nothing on this hub mounts cleartext: a node with a
+  # cleartext mount to the FlashBlade reuses that session for later TLS
+  # mounts, and they fail. Upstream values turn pure-fb-nfsv4's default off.
+  default: true
