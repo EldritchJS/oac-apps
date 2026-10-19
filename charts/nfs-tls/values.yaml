@@ -29,11 +29,14 @@ ca:
     property: ""
 
 storageClass:
+  # Off where the Portworx chart's own class is TLS (portworx.tls: true):
+  # then tlshd is all this chart adds, and there is one class, not two.
+  enabled: true
   name: nfs-over-tls
   default: false
-  # The TLS export policy and server name on the FlashBlade. These are NOT
-  # the cleartext ones: a class pointing at a cleartext export with
-  # xprtsec=tls fails every mount.
+  # The TLS export policy and server name on the FlashBlade, not the
+  # cleartext ones. A cleartext export accepts the mount but does not
+  # require TLS, so it does not enforce encryption.
   nfsPolicy: ""
   nfsServer: ""
 
