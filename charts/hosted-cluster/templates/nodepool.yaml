@@ -11,7 +11,16 @@ metadata:
 spec:
   arch: {{ .arch | default "amd64" }}
   clusterName: {{ $clusterName }}
-  {{- $config := concat $.Values.nodePoolConfig (.config | default list) | uniq }}
+  {{- /* A pool's own entries may be names or HyperShift's {name: ...} form. */}}
+  {{- $config := $.Values.nodePoolConfig }}
+  {{- range .config | default list }}
+  {{- if kindIs "map" . }}
+  {{- $config = append $config .name }}
+  {{- else }}
+  {{- $config = append $config . }}
+  {{- end }}
+  {{- end }}
+  {{- $config = $config | uniq }}
   {{- with $config }}
   config:
     {{- range . }}

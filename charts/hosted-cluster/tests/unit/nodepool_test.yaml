@@ -122,3 +122,20 @@ tests:
           value:
             - name: compliance-node-hardening
             - name: gpu-kernel-args
+
+  - it: should accept a pool's config in HyperShift's {name} form too
+    set:
+      nodePoolConfig: [compliance-node-hardening]
+      nodePools:
+        - name: compute
+          replicas: 1
+          agentLabelSelector: {role: worker}
+          config:
+            - name: gpu-kernel-args
+            - name: compliance-node-hardening
+    asserts:
+      - equal:
+          path: spec.config
+          value:
+            - name: compliance-node-hardening
+            - name: gpu-kernel-args
