@@ -161,8 +161,10 @@ namespaces:
   multicluster-engine:
     quota:
       pods: '50'
-      persistentvolumeclaims: '2'
-      requests.storage: 20Gi
+      # The agent install service (cim in acm.yaml): database 100Gi, files
+      # 500Gi, images 200Gi.
+      persistentvolumeclaims: '5'
+      requests.storage: 1Ti
       services: '30'
       services.nodeports: '0'
       services.loadbalancers: '0'
