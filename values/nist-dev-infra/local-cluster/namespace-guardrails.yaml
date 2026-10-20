@@ -1,6 +1,16 @@
-# nist-dev-infra (test hub). Only the namespaces the compliance charts
-# create. Namespaces owned by the standard hub components (portworx, acm,
-# and the rest) are left alone until their traffic has been measured here.
+# nist-dev-infra (test hub).
+#
+# Quotas (2026-10-19): every non-platform namespace. Object counts and
+# storage only, sized from what each namespace held then: pods and services
+# at twice the count (rounded up to 5; at least 10 and 5), 2 volumes and
+# 20Gi where none were used, no NodePort or LoadBalancer services.
+#
+# NetworkPolicies: the compliance charts' namespaces, and (2026-10-19) five
+# small ones whose traffic is fully known: two operators that serve only an
+# API server webhook and need only the API server, and three with no
+# ordinary pods. Neither Prometheus scrapes any of the five. ACM,
+# multicluster-engine, HyperShift and the rest wait until a spoke exists,
+# so its traffic can be measured first.
 # Rules taken from jetty (compliance/manifests/17-*, 18-*, 22-* in
 # EldritchJS/oac-eldritch-things).
 namespaces:
@@ -20,6 +30,13 @@ namespaces:
       - 8443
     egress:
       apiAndDns: true
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
   stackrox:
     egress:
       apiAndDns: true
@@ -45,5 +62,195 @@ namespaces:
       persistentvolumeclaims: '8'
       requests.storage: 1Ti
       services: '20'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  assisted-installer:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  cert-manager:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  cert-manager-operator:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  default-broker:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  external-dns-operator:
+    ingress:
+      hostNetworkPorts: [9443]
+    egress:
+      apiAndDns: true
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  external-secrets:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  hive:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  hypershift:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  local-cluster:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  metallb-system:
+    quota:
+      pods: '15'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '15'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  moc-metrics-collector:
+    ingress: {}
+    egress: {}
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  multicluster-engine:
+    quota:
+      pods: '50'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '30'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  nfs-tls:
+    ingress: {}
+    egress: {}
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  node-labels:
+    ingress: {}
+    egress: {}
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management:
+    quota:
+      pods: '50'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '40'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-agent:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-agent-addon:
+    quota:
+      pods: '20'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-global-set:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-hub:
+    quota:
+      pods: '40'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-policies:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  patch-operator:
+    ingress:
+      hostNetworkPorts: [9443]
+    egress:
+      apiAndDns: true
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  portworx:
+    quota:
+      pods: '15'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
       services.nodeports: '0'
       services.loadbalancers: '0'
