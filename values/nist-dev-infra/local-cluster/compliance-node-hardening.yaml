@@ -2,8 +2,8 @@
 # On a compact hub that is the whole cluster, one node at a time. Pause the
 # master pool first.
 #
-# The chart's defaults are right for the hub itself. NodePool delivery
-# (nodePool.enabled) stays off until there is a hosted cluster: its
-# ConfigMap goes in the `clusters` namespace, which does not exist yet.
+# The chart's defaults are right for the hub itself. NodePool delivery puts
+# its ConfigMap in the `clusters` namespace, which hub-hcp-config creates;
+# every hosted cluster's NodePools reference it.
 nodePool:
-  enabled: false
+  enabled: true
