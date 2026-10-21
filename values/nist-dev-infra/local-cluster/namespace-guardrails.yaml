@@ -101,6 +101,24 @@ namespaces:
       hostNetworkPorts: [9443]
     egress:
       apiAndDns: true
+    extraPolicies:
+    # external-dns writes the hosted clusters' records in Route 53. Its
+    # endpoints have no fixed addresses, so: HTTPS to anything outside the
+    # private ranges, from the external-dns pods only.
+    - name: allow-egress-route53
+      spec:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: external-dns
+        policyTypes: [Egress]
+        egress:
+        - to:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+              except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16]
+          ports:
+          - port: 443
+            protocol: TCP
     quota:
       pods: '10'
       persistentvolumeclaims: '2'
