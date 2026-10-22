@@ -1,32 +1,4 @@
-# nist-dev-workload0, the first hosted cluster on the test hub. Stock
-# profiles, no tailoring: a baseline of a fresh hosted FIPS cluster, and
-# experiment E1 (does the scanner work on a hosted cluster at all?).
-#
-# The control plane runs on the hub, so there are no masters to scan and
-# no Machine Config Operator to take remediations. Node hardening comes
-# from the hub, through the NodePool.
-subscription:
-  # Red Hat's install settings for hosted control planes: the operator and
-  # its scanners run on the workers, and know the platform is HyperShift.
-  config:
-    nodeSelector:
-      node-role.kubernetes.io/worker: ""
-    env:
-      - name: PLATFORM
-        value: HyperShift
-scanSetting:
-  roles: [worker]
-  # No StorageClass until Portworx comes to this cluster. Results are kept
-  # as ComplianceCheckResult objects; only the raw ARF files are skipped.
-  rawResultStorage:
-    enabled: false
-bindings:
-  - name: cis-baseline
-    profiles:
-      - name: ocp4-cis
-      - name: ocp4-cis-node
-  - name: nist-moderate
-    profiles:
-      - name: ocp4-moderate
-      - name: ocp4-moderate-node
-      - name: rhcos4-moderate
+# nist-dev-workload0. Everything comes from
+# values/nist-dev-infra/hosted-clusters/compliance-operator.yaml, which
+# every hosted cluster on the hub shares. Exceptions for this cluster
+# only would go here, each with a reason.
