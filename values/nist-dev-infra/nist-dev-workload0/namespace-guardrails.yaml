@@ -1,0 +1,24 @@
+# nist-dev-workload0's own namespaces; the shared ones are in
+# hosted-clusters/namespace-guardrails.yaml.
+_quota: &smallQuota
+  pods: '10'
+  services: '5'
+  persistentvolumeclaims: '2'
+  requests.storage: 20Gi
+  services.nodeports: '0'
+  services.loadbalancers: '0'
+
+namespaces:
+  nist-dev-workload0:
+    ingress: {}
+    egress: {}
+    quota: *smallQuota
+  open-cluster-management-nist-dev-workload0:
+    ingress: {}
+    egress: {}
+    quota: *smallQuota
+  # HyperShift runs the NodePool's in-place upgrade pods here during a
+  # rollout. Ingress only: nothing calls them, and their egress was not
+  # measured (no rollout since ACS arrived).
+  nist-dev-workload0-compute-upgrade:
+    ingress: {}
