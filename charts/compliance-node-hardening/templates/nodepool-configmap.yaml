@@ -8,6 +8,14 @@
 {{- $sshd := include "cnh.sshdFile" . | fromJson }}
 {{- $rules = append $rules (dict "name" "sshd-allowusers" "spec" (dict "config" (dict "storage" (dict "files" (list $sshd))))) }}
 {{- end }}
+{{- if .Values.nodePool.usbguardEnable }}
+{{- $unit := dict "name" "usbguard-enable.service" "enabled" true "contents" (.Files.Get "nodepool/usbguard-enable.service") }}
+{{- $rules = append $rules (dict "name" "usbguard-enable" "spec" (dict "config" (dict "systemd" (dict "units" (list $unit))))) }}
+{{- end }}
+{{- if .Values.nodePool.fioStaticPodResourcesDir }}
+{{- $tmpf := dict "path" "/etc/tmpfiles.d/fio-static-pod-resources.conf" "mode" 420 "overwrite" true "contents" (dict "source" (include "cnh.dataURL" "d /etc/kubernetes/static-pod-resources 0755 root root -\n")) }}
+{{- $rules = append $rules (dict "name" "fio-static-pod-resources" "spec" (dict "config" (dict "storage" (dict "files" (list $tmpf))))) }}
+{{- end }}
 {{- range $rules }}
 {{- $r := . }}
 {{- range ((.spec.config).storage).files }}

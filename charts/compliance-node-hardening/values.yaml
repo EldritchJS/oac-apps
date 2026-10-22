@@ -62,3 +62,14 @@ nodePool:
   # Highest Ignition spec version among the inputs; the merged config uses
   # this one.
   ignitionVersion: 3.4.0
+  # rhcos4-moderate-*-service-usbguard-enabled. The usbguard remediation
+  # installs the package as an extension and enables the service in the
+  # same update, before the unit exists, so the service stays disabled. A
+  # oneshot unit enables it at boot instead.
+  usbguardEnable: true
+  # File Integrity Operator on hosted workers. Red Hat does not support FIO
+  # on hosted control planes: its AIDE pods' init container exits unless
+  # /etc/kubernetes/static-pod-resources exists, and hosted workers have no
+  # static pods. This creates the empty directory. Unsupported; off unless a
+  # hub chooses it.
+  fioStaticPodResourcesDir: false
