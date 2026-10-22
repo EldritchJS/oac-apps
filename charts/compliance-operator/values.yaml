@@ -51,3 +51,10 @@ bindings:
       - name: ocp4-moderate
       - name: ocp4-moderate-node
       - name: rhcos4-moderate
+
+# The operator's metrics Service, ServiceMonitor and NonCompliant alert
+# (rule compliance-notification-enabled). The operator creates these itself
+# on a standalone cluster; on a hosted cluster (PLATFORM=HyperShift) it
+# does not, so turn this on there only.
+monitoring:
+  enabled: false

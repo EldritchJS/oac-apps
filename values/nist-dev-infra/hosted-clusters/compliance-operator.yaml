@@ -19,6 +19,9 @@ subscription:
     env:
       - name: PLATFORM
         value: HyperShift
+# The operator does not set up its own monitoring on a hosted cluster.
+monitoring:
+  enabled: true
 scanSetting:
   # No masters: the control plane is on the hub.
   roles: [worker]
@@ -33,6 +36,7 @@ _rationale:
   kcm: &kcm "Hosted control plane: the kube-controller-manager runs on the hub. Checked there (2026-10-22): service-account private key and root CA set, use-service-account-credentials true, secure port 10257, no insecure port."
   etcd: &etcd "Hosted control plane: etcd runs on the hub. Checked there (2026-10-22): server and peer certificates and keys set, client-cert-auth and peer-client-cert-auth true, auto-tls and peer-auto-tls off."
   kubelet: &kubelet "Reads kubelet configuration objects a hosted cluster does not have. The workers' kubelet.conf matches the hub's masters, which pass (serverTLSBootstrap and rotateCertificates true), and no read-only port is listening (checked 2026-10-22)."
+  auditAlert: &auditAlert "The API servers run on the hub, and their metrics are scraped there (user workload monitoring), not in the cluster. The AuditLogError alert is on the hub, in clusters-<cluster> (hosted-cluster chart, auditErrorAlert)."
   fips: &fips "Reads MachineConfigs, which a hosted cluster does not have. HostedCluster.spec.fips is true (hub-wide hosted-cluster values), and rhcos4-moderate enable-fips-mode passes on every worker."
 
 tailoredProfiles:
@@ -122,6 +126,7 @@ tailoredProfiles:
         - {name: ocp4-kubelet-configure-tls-key, rationale: *kubelet}
         - {name: ocp4-kubelet-disable-readonly-port, rationale: *kubelet}
         - {name: ocp4-fips-mode-enabled-on-all-nodes, rationale: *fips}
+        - {name: ocp4-audit-error-alert-exists, rationale: *auditAlert}
 
 bindings:
   - name: cis-baseline

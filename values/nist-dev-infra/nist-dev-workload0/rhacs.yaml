@@ -1,0 +1,4 @@
+# nist-dev-workload0. The rest comes from
+# values/nist-dev-infra/hosted-clusters/rhacs.yaml.
+securedCluster:
+  clusterName: nist-dev-workload0
