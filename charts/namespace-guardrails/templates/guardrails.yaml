@@ -18,6 +18,11 @@ kind: NetworkPolicy
 metadata:
   name: default-deny-ingress
   namespace: {{ $ns }}
+  annotations:
+    # After the allow rules (wave 0): a deny applied first can cut off the
+    # traffic Argo itself needs, such as ACM's cluster-proxy on a managed
+    # cluster, and leave the sync unable to finish.
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   podSelector: {}
   policyTypes: [Ingress]
@@ -86,6 +91,11 @@ kind: NetworkPolicy
 metadata:
   name: default-deny-egress
   namespace: {{ $ns }}
+  annotations:
+    # After the allow rules (wave 0): a deny applied first can cut off the
+    # traffic Argo itself needs, such as ACM's cluster-proxy on a managed
+    # cluster, and leave the sync unable to finish.
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   podSelector: {}
   policyTypes: [Egress]
