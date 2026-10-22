@@ -22,3 +22,4 @@ namespaces:
   # measured (no rollout since ACS arrived).
   nist-dev-workload0-compute-upgrade:
     ingress: {}
+    quota: *smallQuota

@@ -132,6 +132,40 @@ namespaces:
       requests.storage: 20Gi
       services.nodeports: '0'
       services.loadbalancers: '0'
+  open-cluster-management-addon-observability:
+    # ACM observability: collectors read the cluster's Prometheus and
+    # Thanos querier (9091) and push to the hub's metrics endpoint on its
+    # apps address; Prometheus scrapes them on 8080. Measured 2026-10-22.
+    ingress:
+      monitoringPorts: [8080]
+    egress:
+      apiAndDns: true
+    extraPolicies:
+      - name: allow-egress-monitoring-and-hub
+        spec:
+          podSelector: {}
+          policyTypes: [Egress]
+          egress:
+            - to:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: openshift-monitoring
+              ports:
+                - {protocol: TCP, port: 9091}
+            - to:
+                - ipBlock: {cidr: 10.20.19.12/32}
+              ports:
+                - {protocol: TCP, port: 443}
+    quota: *smallQuota
+  # MetalLB ships its own NetworkPolicy; quota only, as on the hub.
+  metallb-system:
+    quota:
+      pods: '15'
+      services: '15'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services.nodeports: '0'
+      services.loadbalancers: '0'
   # No ordinary pods: service accounts, or an operator that cannot start
   # here (grafana-operator: its image is on ghcr.io, outside the registry
   # allowlist).
