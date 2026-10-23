@@ -37,6 +37,7 @@ _rationale:
   etcd: &etcd "Hosted control plane: etcd runs on the hub. Checked there (2026-10-22): server and peer certificates and keys set, client-cert-auth and peer-client-cert-auth true, auto-tls and peer-auto-tls off."
   kubelet: &kubelet "Reads kubelet configuration objects a hosted cluster does not have. The workers' kubelet.conf matches the hub's masters, which pass (serverTLSBootstrap and rotateCertificates true), and no read-only port is listening (checked 2026-10-22)."
   auditAlert: &auditAlert "The API servers run on the hub, and their metrics are scraped there (user workload monitoring), not in the cluster. The AuditLogError alert is on the hub, in clusters-<cluster> (hosted-cluster chart, auditErrorAlert)."
+  vendorLimits: &vendorLimits "Every Deployment and DaemonSet without requests or limits belongs to an operator or add-on that owns its spec and would revert an edit: cert-manager and MetalLB (Red Hat operators) and the ACM add-ons, which the hub deploys (listed 2026-10-23). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rule stays on for every other namespace."
   fips: &fips "Reads MachineConfigs, which a hosted cluster does not have. HostedCluster.spec.fips is true (hub-wide hosted-cluster values), and rhcos4-moderate enable-fips-mode passes on every worker."
 
 tailoredProfiles:
@@ -127,6 +128,13 @@ tailoredProfiles:
         - {name: ocp4-kubelet-disable-readonly-port, rationale: *kubelet}
         - {name: ocp4-fips-mode-enabled-on-all-nodes, rationale: *fips}
         - {name: ocp4-audit-error-alert-exists, rationale: *auditAlert}
+      setValues:
+        - name: ocp4-var-deployment-limit-namespaces-exempt-regex
+          value: "^(cert-manager|cert-manager-operator|metallb-system|open-cluster-management-agent-addon|open-cluster-management-addon-observability)$"
+          rationale: *vendorLimits
+        - name: ocp4-var-daemonset-limit-namespaces-exempt-regex
+          value: "^metallb-system$"
+          rationale: *vendorLimits
 
 bindings:
   - name: cis-baseline
