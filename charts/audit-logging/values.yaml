@@ -1,0 +1,47 @@
+# Cluster Logging and Loki operators, a LokiStack on a COSI bucket, and
+# a ClusterLogForwarder that sends audit logs there. On a hub it also
+# collects the hosted API servers' audit logs, which their audit-logs
+# sidecars write to stdout in clusters-<name>, so a hosted cluster's audit
+# trail outlives the one 10 MB file HyperShift keeps.
+
+logging:
+  namespace: openshift-logging
+  subscription:
+    channel: stable-6.4
+    name: cluster-logging
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+    installPlanApproval: Automatic
+
+loki:
+  namespace: openshift-operators-redhat
+  subscription:
+    channel: stable-6.4
+    name: loki-operator
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+    installPlanApproval: Automatic
+  name: logging-loki
+  # 1x.extra-small suits a test hub; 1x.small and up for production.
+  size: 1x.extra-small
+  # Ingester WAL and index caches need PVCs. Empty uses the default class.
+  storageClassName: ""
+  # Schema start date. Set once, at install, and never change it.
+  schemaEffectiveDate: "2026-10-22"
+  retentionDays: 90
+  storage:
+    # A bucket from the cluster's COSI driver.
+    bucketClassName: fb-bucket
+    bucketAccessClassName: fb-access-rw
+    secretName: logging-loki-s3
+    # ConfigMap in the logging namespace with the S3 endpoint's CA under
+    # service-ca.crt, when the endpoint's certificate is not publicly
+    # trusted. Empty for none.
+    caConfigMap: ""
+
+forwarder:
+  # The cluster's own API audit logs (kube, openshift, oauth API servers)
+  # and node auditd logs.
+  clusterAudit: true
+  # Hub only: the hosted API servers' audit-logs sidecars in clusters-*.
+  hostedControlPlanes: false

@@ -1,0 +1,71 @@
+suite: audit-logging
+tests:
+  - it: should build Loki's S3 secret from the COSI bucket's credentials
+    template: templates/bucket.yaml
+    asserts:
+      - equal:
+          path: spec.bucketClassName
+          value: fb-bucket
+        documentIndex: 0
+      - equal:
+          path: spec.credentialsSecretName
+          value: bucketclaim-logging-loki
+        documentIndex: 1
+      - equal:
+          path: spec.data[0].remoteRef
+          value: {key: bucketclaim-logging-loki, property: BucketInfo}
+        documentIndex: 6
+      - equal:
+          path: spec.target.template.data.endpoint
+          value: "https://{{ (.bucketInfo | fromJson).spec.secretS3.endpoint }}"
+        documentIndex: 6
+      - equal:
+          path: spec.target.template.data.forcepathstyle
+          value: "true"
+        documentIndex: 6
+
+  - it: should keep logs for 90 days on S3
+    template: templates/lokistack.yaml
+    asserts:
+      - isKind:
+          of: LokiStack
+      - equal:
+          path: spec.storage.secret
+          value: {name: logging-loki-s3, type: s3}
+      - equal:
+          path: spec.limits.global.retention.days
+          value: 90
+      - notExists:
+          path: spec.storage.tls
+
+  - it: should forward only the cluster's audit logs by default
+    template: templates/forwarder.yaml
+    asserts:
+      - hasDocuments:
+          count: 4
+      - equal:
+          path: spec.pipelines
+          value:
+            - {name: cluster-audit, inputRefs: [audit], outputRefs: [loki]}
+        documentIndex: 3
+      - notExists:
+          path: spec.inputs
+        documentIndex: 3
+
+  - it: should collect the hosted API servers' audit sidecars on a hub
+    template: templates/forwarder.yaml
+    set:
+      forwarder:
+        hostedControlPlanes: true
+    asserts:
+      - hasDocuments:
+          count: 5
+      - equal:
+          path: spec.inputs[0].application.includes
+          value:
+            - {namespace: "clusters-*", container: audit-logs}
+        documentIndex: 4
+      - contains:
+          path: spec.pipelines
+          content: {name: hosted-api-audit, inputRefs: [hosted-api-audit], outputRefs: [loki]}
+        documentIndex: 4

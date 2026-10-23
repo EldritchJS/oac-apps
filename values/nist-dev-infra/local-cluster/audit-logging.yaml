@@ -1,0 +1,5 @@
+# The bucket comes from the hub's COSI driver. Loki reaches it through the
+# object storage proxy, at s3.nist-dev-infra.nist.int.massopen.cloud, whose
+# Let's Encrypt certificate needs no CA here.
+forwarder:
+  hostedControlPlanes: true
