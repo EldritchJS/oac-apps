@@ -182,3 +182,26 @@ namespaces:
     ingress: {}
     egress: {}
     quota: *smallQuota
+  openshift-logging:
+    # audit-logging in forwarding mode (2026-10-23): the collectors read
+    # the workers' audit logs from host paths and send them to the hub's
+    # LokiStack route on the hub's apps address. The cluster's Prometheus
+    # scrapes the collectors (24231) and the operator (8443). No webhooks.
+    # The collectors are one pod per worker, so pods has room for eight.
+    ingress:
+      monitoringPorts: [24231, 8443]
+    egress:
+      apiAndDns: true
+    extraPolicies:
+      - name: allow-egress-hub-loki
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: collector
+          policyTypes: [Egress]
+          egress:
+            - to:
+                - ipBlock: {cidr: 10.20.19.12/32}
+              ports:
+                - {protocol: TCP, port: 443}
+    quota: *smallQuota
