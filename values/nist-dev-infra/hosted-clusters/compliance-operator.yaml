@@ -40,6 +40,7 @@ _rationale:
   auditAlert: &auditAlert "The API servers run on the hub, and their metrics are scraped there (user workload monitoring), not in the cluster. The AuditLogError alert is on the hub, in clusters-<cluster> (hosted-cluster chart, auditErrorAlert)."
   vendorLimits: &vendorLimits "Every Deployment and DaemonSet without requests or limits belongs to an operator or add-on that owns its spec and would revert an edit: cert-manager and MetalLB (Red Hat operators) and the ACM add-ons, which the hub deploys (listed 2026-10-23). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rule stays on for every other namespace."
   auditRetention: &auditRetention "Hosted control plane: HyperShift runs kube-apiserver and openshift-apiserver with audit-log-maxbackup 1 and audit-log-maxsize 10 (kas-config and openshift-apiserver ConfigMaps in clusters-<cluster>, checked 2026-10-23), so the hub's disk holds at most 20 MB of each. The record is the hub's LokiStack: the hub's forwarder reads the API servers' audit-logs sidecars with AtLeastOnce delivery (buffered on disk while Loki is unreachable) and Loki keeps 90 days (audit-logging chart, local-cluster values; flowing about 60 lines/s on 2026-10-23). Residual risk: a line the collector has not yet read exists only in that file, so a collector outage long enough for the API servers to write 20 MB loses records."
+  oauthIdp: &oauthIdp "Hosted control plane: the OAuth server runs on the hub and takes its identity providers from HostedCluster.spec.configuration.oauth, which HyperShift does not copy to the cluster's oauth/cluster object the rule reads. Checked on the hub (2026-10-23): HostedCluster nist-dev-workload0 has the mocsso OpenID provider (MOC Keycloak), and kubeadmin-removed passes in the cluster."
   fips: &fips "Reads MachineConfigs, which a hosted cluster does not have. HostedCluster.spec.fips is true (hub-wide hosted-cluster values), and rhcos4-moderate enable-fips-mode passes on every worker."
 
 tailoredProfiles:
@@ -74,6 +75,7 @@ tailoredProfiles:
         - {name: ocp4-api-server-tls-cert, rationale: *kas}
         - {name: ocp4-api-server-tls-private-key, rationale: *kas}
         - {name: ocp4-openshift-api-server-audit-log-path, rationale: *auditPath}
+        - {name: ocp4-idp-is-configured, rationale: *oauthIdp}
         - {name: ocp4-controller-service-account-ca, rationale: *kcm}
         - {name: ocp4-controller-service-account-private-key, rationale: *kcm}
         - {name: ocp4-controller-use-service-account, rationale: *kcm}
@@ -120,6 +122,7 @@ tailoredProfiles:
         - {name: ocp4-api-server-tls-cert, rationale: *kas}
         - {name: ocp4-api-server-tls-private-key, rationale: *kas}
         - {name: ocp4-openshift-api-server-audit-log-path, rationale: *auditPath}
+        - {name: ocp4-idp-is-configured, rationale: *oauthIdp}
         - {name: ocp4-controller-insecure-port-disabled, rationale: *kcm}
         - {name: ocp4-controller-secure-port, rationale: *kcm}
         - {name: ocp4-controller-service-account-ca, rationale: *kcm}
