@@ -1,3 +1,4 @@
+{{- if .Values.loki.enabled }}
 # A bucket on the cluster's object storage (COSI), and Loki's S3 secret
 # built from the credentials COSI writes, as acm-observability does.
 apiVersion: objectstorage.k8s.io/v1alpha1
@@ -111,3 +112,4 @@ spec:
       remoteRef:
         key: bucketclaim-{{ .Values.loki.name }}
         property: BucketInfo
+{{- end }}

@@ -6,3 +6,8 @@ forwarder:
 loki:
   # Test hub: the FlashBlade over NFS, the hub's only class.
   storageClassName: pure-fb-nfsv4
+# Hosted clusters that forward their node audit logs here
+# (hosted-clusters/audit-logging.yaml).
+auditWriters:
+  clusters:
+    - nist-dev-workload0

@@ -51,6 +51,7 @@ spec:
             container: audit-logs
   {{- end }}
   outputs:
+    {{- if .Values.loki.enabled }}
     - name: loki
       type: lokiStack
       lokiStack:
@@ -60,10 +61,32 @@ spec:
         authentication:
           token:
             from: serviceAccount
+        tuning:
+          deliveryMode: {{ .Values.forwarder.deliveryMode }}
       tls:
         ca:
           configMapName: openshift-service-ca.crt
           key: service-ca.crt
+    {{- else }}
+    # The hub's LokiStack, through its gateway route. The hub's
+    # audit-writers policy puts the token and the hub's ingress CA here.
+    - name: loki
+      type: loki
+      loki:
+        url: {{ required "forwarder.remote.url is required when loki.enabled is false" .Values.forwarder.remote.url }}
+        authentication:
+          token:
+            from: secret
+            secret:
+              name: {{ .Values.auditWriters.secretName }}
+              key: token
+        tuning:
+          deliveryMode: {{ .Values.forwarder.deliveryMode }}
+      tls:
+        ca:
+          secretName: {{ .Values.auditWriters.secretName }}
+          key: ca-bundle.crt
+    {{- end }}
   pipelines:
     {{- if .Values.forwarder.clusterAudit }}
     - name: cluster-audit

@@ -72,3 +72,83 @@ tests:
           path: spec.pipelines
           content: {name: hosted-api-audit, inputRefs: [hosted-api-audit], outputRefs: [loki]}
         documentIndex: 4
+
+  - it: should buffer on disk rather than drop logs Loki cannot take
+    template: templates/forwarder.yaml
+    asserts:
+      - equal:
+          path: spec.outputs[0].lokiStack.tuning.deliveryMode
+          value: AtLeastOnce
+        documentIndex: 3
+
+  - it: should forward to the hub's LokiStack, and install no Loki, on a managed cluster
+    set:
+      loki:
+        enabled: false
+      forwarder:
+        remote:
+          url: https://hub.example/api/logs/v1/audit
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: templates/lokistack.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/bucket.yaml
+      - hasDocuments:
+          count: 3
+        template: templates/operators.yaml
+      - equal:
+          path: spec.outputs[0]
+          value:
+            name: loki
+            type: loki
+            loki:
+              url: https://hub.example/api/logs/v1/audit
+              authentication:
+                token:
+                  from: secret
+                  secret: {name: hub-loki-audit-writer, key: token}
+              tuning: {deliveryMode: AtLeastOnce}
+            tls:
+              ca: {secretName: hub-loki-audit-writer, key: ca-bundle.crt}
+        template: templates/forwarder.yaml
+        documentIndex: 3
+
+  - it: should require the hub's URL on a managed cluster
+    template: templates/forwarder.yaml
+    set:
+      loki:
+        enabled: false
+    asserts:
+      - failedTemplate:
+          errorMessage: forwarder.remote.url is required when loki.enabled is false
+
+  - it: should give each listed cluster an audit-only writer, and copy its token with a policy
+    template: templates/audit-writers.yaml
+    set:
+      auditWriters:
+        clusters: [workload-a]
+    asserts:
+      - equal:
+          path: roleRef.name
+          value: cluster-logging-write-audit-logs
+        documentIndex: 2
+      - equal:
+          path: spec.predicates[0].requiredClusterSelector.labelSelector.matchExpressions[0].values
+          value: [workload-a]
+        documentIndex: 9
+      - equal:
+          path: spec.hubTemplateOptions.serviceAccountName
+          value: audit-writers-policy
+        documentIndex: 11
+      - equal:
+          path: spec.policy-templates[0].objectDefinition.spec.object-templates[0].objectDefinition.data.token
+          value: '{{hub fromSecret "openshift-logging" (printf "audit-writer-%s-token" .ManagedClusterName) "token" hub}}'
+        documentIndex: 11
+
+  - it: should make no writers by default
+    template: templates/audit-writers.yaml
+    asserts:
+      - hasDocuments:
+          count: 0

@@ -7,9 +7,10 @@
 # does not have, so they fail inside it however the hub is set. The
 # tailored profiles below disable only those, and only where the setting
 # was checked on the hub (for nist-dev-workload0, 2026-10-22). Every
-# other failure stays, including two that the hub check showed are real:
-# the API servers keep one 10 MB audit log file (api-server-audit-log-
-# maxbackup/-maxsize, ocp-api-server-audit-log-maxbackup/-maxsize).
+# other failure stays. The API servers' audit log rotation is the one
+# exception that is not a visibility problem: HyperShift keeps one 10 MB
+# file, and the rules are disabled because the hub's LokiStack is the
+# record (rationale auditRetention, with its residual risk).
 subscription:
   # Red Hat's install settings for hosted control planes: the operator and
   # its scanners run on the workers, and know the platform is HyperShift.
@@ -32,12 +33,13 @@ scanSetting:
 
 _rationale:
   kas: &kas "Hosted control plane: the kube-apiserver runs on the hub, and its configuration is not visible in the cluster. Checked on the hub (kas-config and the kube-apiserver deployment in clusters-<cluster>, 2026-10-22): admission plugins NamespaceLifecycle, NodeRestriction, ServiceAccount and the SCC plugins enabled; authorization-mode includes RBAC and Node; serving on 0.0.0.0:6443 with its own certificate and key; client CA, etcd CA and client certificate, kubelet CA and client certificate set; service-account lookup on and public key file set; min-request-timeout 3600; secrets encrypted with aescbc."
-  auditPath: &auditPath "Hosted control plane: the API servers run on the hub. Checked there (2026-10-22): kube-apiserver writes /var/log/kube-apiserver/audit.log and openshift-apiserver /var/log/openshift-apiserver/audit.log. Retention is short and stays a finding (the maxbackup and maxsize rules are not disabled)."
+  auditPath: &auditPath "Hosted control plane: the API servers run on the hub. Checked there (2026-10-22): kube-apiserver writes /var/log/kube-apiserver/audit.log and openshift-apiserver /var/log/openshift-apiserver/audit.log."
   kcm: &kcm "Hosted control plane: the kube-controller-manager runs on the hub. Checked there (2026-10-22): service-account private key and root CA set, use-service-account-credentials true, secure port 10257, no insecure port."
   etcd: &etcd "Hosted control plane: etcd runs on the hub. Checked there (2026-10-22): server and peer certificates and keys set, client-cert-auth and peer-client-cert-auth true, auto-tls and peer-auto-tls off."
   kubelet: &kubelet "Reads kubelet configuration objects a hosted cluster does not have. The workers' kubelet.conf matches the hub's masters, which pass (serverTLSBootstrap and rotateCertificates true), and no read-only port is listening (checked 2026-10-22)."
   auditAlert: &auditAlert "The API servers run on the hub, and their metrics are scraped there (user workload monitoring), not in the cluster. The AuditLogError alert is on the hub, in clusters-<cluster> (hosted-cluster chart, auditErrorAlert)."
   vendorLimits: &vendorLimits "Every Deployment and DaemonSet without requests or limits belongs to an operator or add-on that owns its spec and would revert an edit: cert-manager and MetalLB (Red Hat operators) and the ACM add-ons, which the hub deploys (listed 2026-10-23). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rule stays on for every other namespace."
+  auditRetention: &auditRetention "Hosted control plane: HyperShift runs kube-apiserver and openshift-apiserver with audit-log-maxbackup 1 and audit-log-maxsize 10 (kas-config and openshift-apiserver ConfigMaps in clusters-<cluster>, checked 2026-10-23), so the hub's disk holds at most 20 MB of each. The record is the hub's LokiStack: the hub's forwarder reads the API servers' audit-logs sidecars with AtLeastOnce delivery (buffered on disk while Loki is unreachable) and Loki keeps 90 days (audit-logging chart, local-cluster values; flowing about 60 lines/s on 2026-10-23). Residual risk: a line the collector has not yet read exists only in that file, so a collector outage long enough for the API servers to write 20 MB loses records."
   fips: &fips "Reads MachineConfigs, which a hosted cluster does not have. HostedCluster.spec.fips is true (hub-wide hosted-cluster values), and rhcos4-moderate enable-fips-mode passes on every worker."
 
 tailoredProfiles:
@@ -52,6 +54,10 @@ tailoredProfiles:
         - {name: ocp4-api-server-admission-control-plugin-scc, rationale: *kas}
         - {name: ocp4-api-server-admission-control-plugin-service-account, rationale: *kas}
         - {name: ocp4-api-server-audit-log-path, rationale: *auditPath}
+        - {name: ocp4-api-server-audit-log-maxbackup, rationale: *auditRetention}
+        - {name: ocp4-api-server-audit-log-maxsize, rationale: *auditRetention}
+        - {name: ocp4-ocp-api-server-audit-log-maxbackup, rationale: *auditRetention}
+        - {name: ocp4-ocp-api-server-audit-log-maxsize, rationale: *auditRetention}
         - {name: ocp4-api-server-auth-mode-rbac, rationale: *kas}
         - {name: ocp4-api-server-bind-address, rationale: *kas}
         - {name: ocp4-api-server-client-ca, rationale: *kas}
@@ -93,6 +99,10 @@ tailoredProfiles:
         - {name: ocp4-api-server-admission-control-plugin-scc, rationale: *kas}
         - {name: ocp4-api-server-admission-control-plugin-service-account, rationale: *kas}
         - {name: ocp4-api-server-audit-log-path, rationale: *auditPath}
+        - {name: ocp4-api-server-audit-log-maxbackup, rationale: *auditRetention}
+        - {name: ocp4-api-server-audit-log-maxsize, rationale: *auditRetention}
+        - {name: ocp4-ocp-api-server-audit-log-maxbackup, rationale: *auditRetention}
+        - {name: ocp4-ocp-api-server-audit-log-maxsize, rationale: *auditRetention}
         - {name: ocp4-api-server-auth-mode-node, rationale: *kas}
         - {name: ocp4-api-server-auth-mode-rbac, rationale: *kas}
         - {name: ocp4-api-server-bind-address, rationale: *kas}

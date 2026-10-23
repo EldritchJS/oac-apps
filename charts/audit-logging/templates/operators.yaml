@@ -32,6 +32,7 @@ spec:
   sourceNamespace: {{ .sourceNamespace }}
   installPlanApproval: {{ .installPlanApproval }}
   {{- end }}
+{{- if .Values.loki.enabled }}
 ---
 apiVersion: v1
 kind: Namespace
@@ -67,3 +68,4 @@ spec:
   sourceNamespace: {{ .sourceNamespace }}
   installPlanApproval: {{ .installPlanApproval }}
   {{- end }}
+{{- end }}

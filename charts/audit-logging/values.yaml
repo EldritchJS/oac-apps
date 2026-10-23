@@ -2,7 +2,8 @@
 # a ClusterLogForwarder that sends audit logs there. On a hub it also
 # collects the hosted API servers' audit logs, which their audit-logs
 # sidecars write to stdout in clusters-<name>, so a hosted cluster's audit
-# trail outlives the one 10 MB file HyperShift keeps.
+# trail outlives the one 10 MB file HyperShift keeps. A managed cluster
+# can instead forward to its hub's LokiStack (loki.enabled false).
 
 logging:
   namespace: openshift-logging
@@ -14,6 +15,9 @@ logging:
     installPlanApproval: Automatic
 
 loki:
+  # False on a managed cluster that forwards to its hub: no Loki operator,
+  # LokiStack or bucket, and forwarder.remote.url is required.
+  enabled: true
   namespace: openshift-operators-redhat
   subscription:
     channel: stable-6.6
@@ -46,3 +50,19 @@ forwarder:
   clusterAudit: true
   # Hub only: the hosted API servers' audit-logs sidecars in clusters-*.
   hostedControlPlanes: false
+  # AtLeastOnce: the collector buffers on the node's disk while Loki is
+  # unreachable, and resends. AtMostOnce drops what it cannot send.
+  deliveryMode: AtLeastOnce
+  remote:
+    # The hub LokiStack gateway's audit tenant, e.g.
+    # https://logging-loki-openshift-logging.apps.<hub domain>/api/logs/v1/audit
+    url: ""
+
+# Hub side: the managed clusters that forward to this LokiStack. Each gets
+# a service account here that may write only the audit tenant. An ACM
+# policy copies its token, and the hub's ingress CA (the gateway route's
+# issuer), into a Secret of this name in the cluster's logging namespace.
+auditWriters:
+  clusters: []
+  clusterSet: default
+  secretName: hub-loki-audit-writer
