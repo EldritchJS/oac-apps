@@ -7,7 +7,7 @@
 logging:
   namespace: openshift-logging
   subscription:
-    channel: stable-6.4
+    channel: stable-6.6
     name: cluster-logging
     source: redhat-operators
     sourceNamespace: openshift-marketplace
@@ -16,7 +16,7 @@ logging:
 loki:
   namespace: openshift-operators-redhat
   subscription:
-    channel: stable-6.4
+    channel: stable-6.6
     name: loki-operator
     source: redhat-operators
     sourceNamespace: openshift-marketplace
