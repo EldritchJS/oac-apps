@@ -34,6 +34,11 @@ loki:
   # Schema start date. Set once, at install, and never change it.
   schemaEffectiveDate: "2026-10-22"
   retentionDays: 90
+  # Per-tenant limits (LokiStack spec.limits.tenants), by tenant name:
+  # application, infrastructure, audit. Empty keeps the size's defaults
+  # (for 1x.extra-small: 4 MB/s, 6 MB burst, 256 kB lines). A batch
+  # bigger than the burst is refused every time it is retried.
+  tenantLimits: {}
   storage:
     # A bucket from the cluster's COSI driver.
     bucketClassName: fb-bucket

@@ -25,6 +25,10 @@ spec:
     global:
       retention:
         days: {{ .Values.loki.retentionDays }}
+    {{- with .Values.loki.tenantLimits }}
+    tenants:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
   tenants:
     mode: openshift-logging
 {{- end }}

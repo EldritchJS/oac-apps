@@ -152,3 +152,15 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should pass per-tenant limits through to the LokiStack
+    template: templates/lokistack.yaml
+    set:
+      loki:
+        tenantLimits:
+          application:
+            ingestion: {maxLineSize: 2097152}
+    asserts:
+      - equal:
+          path: spec.limits.tenants.application.ingestion.maxLineSize
+          value: 2097152
