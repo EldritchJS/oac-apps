@@ -1,4 +1,7 @@
 suite: audit-logging
+set:
+  loki:
+    storageClassName: test-class
 tests:
   - it: should build Loki's S3 secret from the COSI bucket's credentials
     template: templates/bucket.yaml

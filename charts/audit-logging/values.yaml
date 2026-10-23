@@ -24,7 +24,8 @@ loki:
   name: logging-loki
   # 1x.extra-small suits a test hub; 1x.small and up for production.
   size: 1x.extra-small
-  # Ingester WAL and index caches need PVCs. Empty uses the default class.
+  # Ingester WAL and index caches need PVCs. Required: the LokiStack API
+  # does not fall back to the default class.
   storageClassName: ""
   # Schema start date. Set once, at install, and never change it.
   schemaEffectiveDate: "2026-10-22"

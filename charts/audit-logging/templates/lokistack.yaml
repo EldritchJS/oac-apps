@@ -8,9 +8,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   size: {{ .Values.loki.size }}
-  {{- with .Values.loki.storageClassName }}
-  storageClassName: {{ . }}
-  {{- end }}
+  storageClassName: {{ required "loki.storageClassName is required" .Values.loki.storageClassName }}
   storage:
     schemas:
       - version: v13

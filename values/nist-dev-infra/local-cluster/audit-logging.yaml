@@ -3,3 +3,6 @@
 # Let's Encrypt certificate needs no CA here.
 forwarder:
   hostedControlPlanes: true
+loki:
+  # Test hub: the FlashBlade over NFS, the hub's only class.
+  storageClassName: pure-fb-nfsv4
