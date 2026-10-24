@@ -274,3 +274,64 @@ namespaces:
       services: '10'
       services.nodeports: '0'
       services.loadbalancers: '0'
+  # Namespaces that appeared with stage D and object storage (sized
+  # 2026-10-23, same rule as above). Quota only: their traffic is not
+  # measured yet. open-cluster-management-observability held 34 pods, 20
+  # services and 13 volumes (436Gi: Thanos receivers, store, compactor,
+  # Alertmanager).
+  clusters:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  container-object-storage-system:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  hardware-inventory:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  klusterlet-nist-dev-workload0:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  nist-dev-workload0:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  object-storage-proxy:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  open-cluster-management-observability:
+    quota:
+      pods: '70'
+      persistentvolumeclaims: '26'
+      requests.storage: 900Gi
+      services: '40'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
