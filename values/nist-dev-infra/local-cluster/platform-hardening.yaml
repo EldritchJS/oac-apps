@@ -9,7 +9,39 @@ systemUseNotice:
     This is a development cluster for compliance testing. Use is limited to
     authorized users. The approved system use notice is pending.
 
-# Off until the images in use on this hub have been inventoried: a missing
-# registry stops pods from pulling.
+# From an inventory of every image reference on the hub (2026-10-24):
+# running and scaled-down workloads, Jobs and CronJobs, CatalogSources, CSV
+# related images and ImageStreams. Narrowed to repositories where only one
+# is used. A registry missing here stops new pods from pulling; running
+# pods are unaffected. Changing the list reloads CRI-O on each node (no
+# drain or reboot).
 imageConfig:
-  enabled: false
+  enabled: true
+  allowedRegistries:
+    - registry.redhat.io
+    - registry.access.redhat.com
+    # Portworx operator (certified).
+    - registry.connect.redhat.com
+    # The release payload: the hub's platform and hosted control planes.
+    - quay.io/openshift-release-dev
+    # patch-operator (community).
+    - quay.io/redhat-cop
+    - quay.io/community-operator-pipeline-prod
+    # CSI sidecars (Portworx, snapshots, COSI).
+    - registry.k8s.io/sig-storage
+    # Portworx CSI driver and attacher.
+    - docker.io/portworx
+    # object-storage-proxy (docker.io/haproxy).
+    - docker.io/library/haproxy
+    # pure-cosi driver.
+    - ghcr.io/cci-moc
+    # tlshd (nfs-tls).
+    - ghcr.io/eldritchjs
+    # COSI controller, from the upstream pure-cosi manifests: a staging
+    # registry and a release-candidate build. A supply-chain gap to record
+    # until a released image replaces it.
+    - gcr.io/k8s-staging-sig-storage
+  allowedRegistriesForImport:
+    - domainName: registry.redhat.io
+    - domainName: registry.access.redhat.com
+    - domainName: quay.io
