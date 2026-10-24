@@ -157,6 +157,11 @@ namespaces:
               ports:
                 - {protocol: TCP, port: 443}
     quota: *smallQuota
+  # External Secrets ships its own NetworkPolicies (deny all, then the API
+  # server, DNS and the operator's egress); quota only. Four pods, four
+  # services, no volumes (2026-10-23).
+  external-secrets:
+    quota: *smallQuota
   # MetalLB ships its own NetworkPolicy; quota only, as on the hub.
   metallb-system:
     quota:
@@ -166,9 +171,9 @@ namespaces:
       requests.storage: 20Gi
       services.nodeports: '0'
       services.loadbalancers: '0'
-  # No ordinary pods: service accounts, or an operator that cannot start
-  # here (grafana-operator: its image is on ghcr.io, outside the registry
-  # allowlist).
+  # No ordinary pods: service accounts, or an operator that talks only to
+  # the API server (grafana-operator, which runs since ghcr.io/grafana was
+  # allowed, oac-apps #172).
   grafana-operator:
     ingress: {}
     egress:

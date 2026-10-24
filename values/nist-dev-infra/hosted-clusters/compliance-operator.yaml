@@ -38,9 +38,11 @@ _rationale:
   etcd: &etcd "Hosted control plane: etcd runs on the hub. Checked there (2026-10-22): server and peer certificates and keys set, client-cert-auth and peer-client-cert-auth true, auto-tls and peer-auto-tls off."
   kubelet: &kubelet "Reads kubelet configuration objects a hosted cluster does not have. The workers' kubelet.conf matches the hub's masters, which pass (serverTLSBootstrap and rotateCertificates true), and no read-only port is listening (checked 2026-10-22)."
   auditAlert: &auditAlert "The API servers run on the hub, and their metrics are scraped there (user workload monitoring), not in the cluster. The AuditLogError alert is on the hub, in clusters-<cluster> (hosted-cluster chart, auditErrorAlert)."
-  vendorLimits: &vendorLimits "Every Deployment and DaemonSet without requests or limits belongs to an operator or add-on that owns its spec and would revert an edit: cert-manager and MetalLB (Red Hat operators) and the ACM add-ons, which the hub deploys (listed 2026-10-23). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rule stays on for every other namespace."
+  vendorLimits: &vendorLimits "Every Deployment and DaemonSet without requests or limits belongs to an operator or add-on that owns its spec and would revert an edit: cert-manager, External Secrets and MetalLB (Red Hat operators) and the ACM add-ons, which the hub deploys (listed 2026-10-23). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rule stays on for every other namespace."
   auditRetention: &auditRetention "Hosted control plane: HyperShift runs kube-apiserver and openshift-apiserver with audit-log-maxbackup 1 and audit-log-maxsize 10 (kas-config and openshift-apiserver ConfigMaps in clusters-<cluster>, checked 2026-10-23), so the hub's disk holds at most 20 MB of each. The record is the hub's LokiStack: the hub's forwarder reads the API servers' audit-logs sidecars with AtLeastOnce delivery (buffered on disk while Loki is unreachable) and Loki keeps 90 days (audit-logging chart, local-cluster values; flowing about 60 lines/s on 2026-10-23). Residual risk: a line the collector has not yet read exists only in that file, so a collector outage long enough for the API servers to write 20 MB loses records."
   oauthIdp: &oauthIdp "Hosted control plane: the OAuth server runs on the hub and takes its identity providers from HostedCluster.spec.configuration.oauth, which HyperShift does not copy to the cluster's oauth/cluster object the rule reads. Checked on the hub (2026-10-23): HostedCluster nist-dev-workload0 has the mocsso OpenID provider (MOC Keycloak), and kubeadmin-removed passes in the cluster."
+  oauthTokens: &oauthTokens "Hosted control plane: the OAuth server runs on the hub and takes its token settings from HostedCluster.spec.configuration.oauth.tokenConfig, which HyperShift does not copy to the cluster's oauth/cluster object the rule reads. Checked on the hub (2026-10-23): HostedCluster nist-dev-workload0 and the running OAuth server's config (the oauth-openshift ConfigMap in clusters-<cluster>) have accessTokenInactivityTimeout 10m and accessTokenMaxAgeSeconds 86400, from the hub-wide hosted-cluster values."
+  ingressCert: &ingressCert "The rule takes a trusted CA bundle in proxy/cluster (spec.trustedCA) as the sign that the default ingress certificate was replaced. Every hosted cluster on this hub replaces it with a Let's Encrypt wildcard certificate (cluster-certificates, cert-manager DNS-01), which chains to a public root already in the system trust, so no custom bundle is needed. Checked on nist-dev-workload0 (2026-10-23): the IngressController's default certificate is that Certificate, and the router serves it (issuer Let's Encrypt YR1, *.apps.<cluster domain>)."
   fips: &fips "Reads MachineConfigs, which a hosted cluster does not have. HostedCluster.spec.fips is true (hub-wide hosted-cluster values), and rhcos4-moderate enable-fips-mode passes on every worker."
 
 tailoredProfiles:
@@ -123,6 +125,9 @@ tailoredProfiles:
         - {name: ocp4-api-server-tls-private-key, rationale: *kas}
         - {name: ocp4-openshift-api-server-audit-log-path, rationale: *auditPath}
         - {name: ocp4-idp-is-configured, rationale: *oauthIdp}
+        - {name: ocp4-oauth-or-oauthclient-inactivity-timeout, rationale: *oauthTokens}
+        - {name: ocp4-oauth-or-oauthclient-token-maxage, rationale: *oauthTokens}
+        - {name: ocp4-default-ingress-ca-replaced, rationale: *ingressCert}
         - {name: ocp4-controller-insecure-port-disabled, rationale: *kcm}
         - {name: ocp4-controller-secure-port, rationale: *kcm}
         - {name: ocp4-controller-service-account-ca, rationale: *kcm}
@@ -143,7 +148,7 @@ tailoredProfiles:
         - {name: ocp4-audit-error-alert-exists, rationale: *auditAlert}
       setValues:
         - name: ocp4-var-deployment-limit-namespaces-exempt-regex
-          value: "^(cert-manager|cert-manager-operator|metallb-system|open-cluster-management-agent-addon|open-cluster-management-addon-observability)$"
+          value: "^(cert-manager|cert-manager-operator|external-secrets|metallb-system|open-cluster-management-agent-addon|open-cluster-management-addon-observability)$"
           rationale: *vendorLimits
         - name: ocp4-var-daemonset-limit-namespaces-exempt-regex
           value: "^metallb-system$"
