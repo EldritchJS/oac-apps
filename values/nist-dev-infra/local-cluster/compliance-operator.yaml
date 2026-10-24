@@ -12,8 +12,14 @@ scanSetting:
   rawResultStorage:
     enabled: false
 
-# The only tailoring: two scanner false positives, one as on jetty. Every
-# other failure is fixed or recorded as a gap, not tailored away.
+# The only tailoring: two scanner false positives, one as on jetty, and
+# the namespaces whose workloads an operator owns, exempted from the
+# requests-and-limits rules (vendorLimits below). Every other failure is
+# fixed or recorded as a gap, not tailored away.
+_rationale:
+  vendorLimits: &vendorLimits "Every Deployment, DaemonSet and StatefulSet without requests or limits in these namespaces belongs to an operator that owns its spec and would revert an edit (listed on nist-dev-infra 2026-10-24): ACM and its hub, agent and observability (MultiClusterHub, ClusterManager, Klusterlet, MultiClusterObservability), multicluster-engine with HyperShift, Hive and the agent install service, and HyperShift's hosted control planes (clusters-*, which set requests but not limits by design); cert-manager, External Secrets, external-dns, MetalLB, Portworx and patch-operator (OLM operators). Each namespace has a ResourceQuota (namespace-guardrails), which bounds what it can use. The rules stay on for every other namespace. pure-cosi-driver, in portworx, gets requests and limits from oac-apps (kustomize/pure-cosi)."
+  vendorRegex: &vendorRegex "^(cert-manager|cert-manager-operator|clusters-.*|external-dns-operator|external-secrets|hive|hypershift|klusterlet-.*|metallb-system|multicluster-engine|open-cluster-management|open-cluster-management-agent|open-cluster-management-agent-addon|open-cluster-management-hub|open-cluster-management-observability|patch-operator|portworx)$"
+
 tailoredProfiles:
   - name: nist-ocp4-cis
     spec:
@@ -33,6 +39,16 @@ tailoredProfiles:
           rationale: "Scanner false positive, OCPBUGS-126610: the content checks the kube-apiserver ConfigMap for the openshift-apiserver path. The real openshift-apiserver audit-log-path is set (/var/log/openshift-apiserver/audit.log, checked 2026-10-19) and is verified directly by tests/verify.sh T-03. Re-enable when fixed content ships."
         - name: ocp4-audit-log-forwarding-uses-tls
           rationale: "Scanner false positive: the rule lists the url of each ClusterLogForwarder output and fails when none is https or tls. The hub's only output (openshift-logging/audit) is of type lokiStack, which has no url field: it sends to the LokiStack gateway in the cluster over https, verifying the gateway with the service CA (checked 2026-10-23). audit-log-forwarding-enabled passes."
+      setValues:
+        - name: ocp4-var-deployment-limit-namespaces-exempt-regex
+          value: *vendorRegex
+          rationale: *vendorLimits
+        - name: ocp4-var-daemonset-limit-namespaces-exempt-regex
+          value: *vendorRegex
+          rationale: *vendorLimits
+        - name: ocp4-var-statefulset-limit-namespaces-exempt-regex
+          value: *vendorRegex
+          rationale: *vendorLimits
 
 bindings:
   - name: cis-baseline
