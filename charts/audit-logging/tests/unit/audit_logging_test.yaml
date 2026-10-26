@@ -164,3 +164,13 @@ tests:
       - equal:
           path: spec.limits.tenants.application.ingestion.maxLineSize
           value: 2097152
+
+  - it: should leave the hub's CA out when hubIngressCA is off
+    template: templates/forwarder.yaml
+    set:
+      loki.enabled: false
+      forwarder.remote.url: https://hub.example/api/logs/v1/audit
+      forwarder.remote.hubIngressCA: false
+    asserts:
+      - notExists:
+          path: spec.outputs[0].tls

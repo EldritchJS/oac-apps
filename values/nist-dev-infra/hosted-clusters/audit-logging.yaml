@@ -9,3 +9,5 @@ loki:
 forwarder:
   remote:
     url: https://logging-loki-openshift-logging.apps.nist-dev-infra.nist.int.massopen.cloud/api/logs/v1/audit
+    # The hub's apps certificate is from Let's Encrypt (oac-apps #184).
+    hubIngressCA: false

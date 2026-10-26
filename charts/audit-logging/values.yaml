@@ -62,6 +62,12 @@ forwarder:
     # The hub LokiStack gateway's audit tenant, e.g.
     # https://logging-loki-openshift-logging.apps.<hub domain>/api/logs/v1/audit
     url: ""
+    # Trust only the hub's ingress CA, as the audit-writers policy copies
+    # it. Right for a hub with the ingress operator's self-signed
+    # certificate. Turn it off once the hub's apps certificate is publicly
+    # trusted: the copy is then the chain without its root, which the
+    # collector cannot verify, and system trust already covers it.
+    hubIngressCA: true
 
 # Hub side: the managed clusters that forward to this LokiStack. Each gets
 # a service account here that may write only the audit tenant. An ACM

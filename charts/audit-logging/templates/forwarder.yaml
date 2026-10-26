@@ -82,10 +82,12 @@ spec:
               key: token
         tuning:
           deliveryMode: {{ .Values.forwarder.deliveryMode }}
+      {{- if .Values.forwarder.remote.hubIngressCA }}
       tls:
         ca:
           secretName: {{ .Values.auditWriters.secretName }}
           key: ca-bundle.crt
+      {{- end }}
     {{- end }}
   pipelines:
     {{- if .Values.forwarder.clusterAudit }}
