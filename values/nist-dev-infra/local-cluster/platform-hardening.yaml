@@ -49,3 +49,8 @@ imageConfig:
   # registry.access.redhat.com (2026-10-26); the operator moves the second
   # to the first. Clears openshift-samples Degraded since 2026-10-24.
   samplesRegistry: registry.redhat.io
+
+# Nothing else renders the APIServer here: cluster-certificates has
+# certificates.api disabled on this hub (oac-apps #184).
+apiServerAudit:
+  enabled: true

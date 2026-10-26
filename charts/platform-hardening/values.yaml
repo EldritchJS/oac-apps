@@ -25,6 +25,18 @@ imageConfig:
   # registry.access.redhat.com and quay.io to it.
   samplesRegistry: ""
 
+# API server audit profile (800-53 AU-2, AU-3, AU-12): closes
+# audit-profile-set. WriteRequestBodies logs the body of every write, so
+# secrets' contents reach the audit log: the log's storage and access are
+# then as sensitive as the secrets. Changing it rolls the kube-apiservers,
+# one control-plane node at a time.
+#
+# Hosted clusters: leave this off. Their audit profile is
+# HostedCluster.spec.configuration.apiServer.audit on the hub.
+apiServerAudit:
+  enabled: false
+  profile: WriteRequestBodies
+
 # System use notification (800-53 AC-8): closes banner-or-login-template-set
 # and openshift-motd-exists. The wording must come from the organisation's
 # legal or compliance office and match every other login point; there is no
