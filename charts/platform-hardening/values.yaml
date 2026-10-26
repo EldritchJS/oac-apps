@@ -26,10 +26,13 @@ imageConfig:
   samplesRegistry: ""
 
 # API server audit profile (800-53 AU-2, AU-3, AU-12): closes
-# audit-profile-set. WriteRequestBodies logs the body of every write, so
-# secrets' contents reach the audit log: the log's storage and access are
-# then as sensitive as the secrets. Changing it rolls the kube-apiservers,
-# one control-plane node at a time.
+# audit-profile-set. WriteRequestBodies logs the request and response of
+# every write, except for Secrets, service account tokens, token reviews,
+# OAuth clients, routes and MachineConfigs, which stay at Metadata
+# (OpenShift's policy, checked on nist-dev-infra 2026-10-26). Secret
+# values stay out of the log; the bodies of other writes, ConfigMaps
+# included, do not. Changing it rolls the kube-apiservers, one
+# control-plane node at a time.
 #
 # Hosted clusters: leave this off. Their audit profile is
 # HostedCluster.spec.configuration.apiServer.audit on the hub.
