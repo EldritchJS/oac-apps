@@ -45,3 +45,7 @@ imageConfig:
     - domainName: registry.redhat.io
     - domainName: registry.access.redhat.com
     - domainName: quay.io
+  # Every sample imagestream is from registry.redhat.io or
+  # registry.access.redhat.com (2026-10-26); the operator moves the second
+  # to the first. Clears openshift-samples Degraded since 2026-10-24.
+  samplesRegistry: registry.redhat.io

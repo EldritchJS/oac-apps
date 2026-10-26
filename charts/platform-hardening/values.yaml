@@ -16,6 +16,14 @@ imageConfig:
   enabled: false
   allowedRegistries: []
   allowedRegistriesForImport: []
+  # With samplesRegistry empty, the samples operator creates imagestreams
+  # only if allowedRegistries holds both registry.redhat.io and a bare
+  # quay.io; otherwise openshift-samples goes Degraded
+  # (GlobalImageStreamConfigRegistryMismatch). Naming a listed registry
+  # here passes that check without allowing all of quay.io. The operator
+  # then rewrites every sample pull spec from docker.io, registry.redhat.io,
+  # registry.access.redhat.com and quay.io to it.
+  samplesRegistry: ""
 
 # System use notification (800-53 AC-8): closes banner-or-login-template-set
 # and openshift-motd-exists. The wording must come from the organisation's
