@@ -1,0 +1,8 @@
+# LVM Storage for the hosted clusters' etcd (lvms-vg0, the hosted-cluster
+# chart's default), on each worker's second disk. The workers are three
+# FC430s; node-labels marks every worker massopen.cloud/lvmcluster.
+# TODO: confirm the path from the workers' discovery boot. On jetty's FC430s
+# the second SSD was always this slot.
+volumegroup:
+  devices:
+    - /dev/disk/by-path/pci-0000:00:11.4-ata-2
