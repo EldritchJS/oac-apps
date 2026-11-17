@@ -1,0 +1,7 @@
+# KubeVirt hosted clusters whose worker VMs run on compliant-dev-workload0.
+# Each gets a compliant-dev-workload0-kubeconfig secret on the hub. GPU
+# pools with qosClass Guaranteed need HyperConverged's maxHotplugRatio at
+# 1: at the default 4, a VM over 63 vCPUs gets a virtual IOMMU and QEMU
+# refuses to pass it GPUs.
+hostedClusters:
+  - andalusia

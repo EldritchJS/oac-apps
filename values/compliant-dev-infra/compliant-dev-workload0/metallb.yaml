@@ -1,0 +1,8 @@
+# LoadBalancer addresses for the KubeVirt guests' ingress, on the workers'
+# network (VLAN 220), as oac-dev-workload1's are on its own.
+# TODO: confirm with the network owners that this range is outside VLAN
+# 220's DHCP range.
+addressPools:
+  - name: default
+    addresses:
+      - 10.20.21.200-10.20.21.250
