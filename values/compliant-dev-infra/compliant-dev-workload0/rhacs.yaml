@@ -1,0 +1,4 @@
+# compliant-dev-workload0. The rest comes from
+# values/compliant-dev-infra/hosted-clusters/rhacs.yaml.
+securedCluster:
+  clusterName: compliant-dev-workload0

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: namespace-guardrails-app
+description: >-
+  Stopgap for compliant-dev-infra: default-deny NetworkPolicies and
+  object-count quotas for platform add-on namespaces, as one application.
+  Upstream's namespace-guardrails is now a library that each chart includes
+  (MOC-issues #756).
+version: 0.1.0
+type: application
