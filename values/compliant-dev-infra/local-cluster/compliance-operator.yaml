@@ -1,16 +1,14 @@
 # compliant-dev-infra (test hub). Stage A ran the scanner alone, with no
 # tailoring, to measure a fresh FIPS install before anything was hardened.
 #
-# Compact hub: all three nodes are masters, and the worker pool is empty.
-# Scanning the worker role as well would scan the same nodes twice.
+# Three masters (R440s) and three workers (FC430s): scan both roles.
 scanSetting:
-  roles: [master]
-  # The hub has no StorageClass yet: Portworx is not configured for it.
-  # Results are still kept as ComplianceCheckResult objects; only the raw
-  # ARF files (evidence archive) are skipped. Turn this back on, with the
-  # class, once storage exists.
+  roles: [master, worker]
+  # Raw ARF results are the evidence archive (T-04). The FlashBlade over
+  # NFS with TLS is the hub's default class.
   rawResultStorage:
-    enabled: false
+    enabled: true
+    storageClassName: pure-fb-nfsv4
 
 # The only tailoring: two scanner false positives, one as on jetty; the
 # ingress CA rule, which a publicly issued certificate cannot satisfy
