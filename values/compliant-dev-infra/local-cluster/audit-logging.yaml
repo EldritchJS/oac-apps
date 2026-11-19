@@ -12,8 +12,16 @@ loki:
   # default 256 kB line limit, and the tenant's rate limit refused about
   # half of what the collector sent, retries included, though the API
   # servers write about 50 kB/s.
+  # The hub's own API servers audit at WriteRequestBodies too, into the audit
+  # tenant: at its defaults (2 MB/s, 256 kB lines) Loki refused about 110
+  # pushes a minute and dropped whole-ConfigMap lines (2026-11-19).
   tenantLimits:
     application:
+      ingestion:
+        ingestionRate: 16
+        ingestionBurstSize: 32
+        maxLineSize: 2097152
+    audit:
       ingestion:
         ingestionRate: 16
         ingestionBurstSize: 32
