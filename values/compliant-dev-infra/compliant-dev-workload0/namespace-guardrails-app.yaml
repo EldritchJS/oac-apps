@@ -65,3 +65,10 @@ namespaces:
       services: '5'
       services.nodeports: '0'
       services.loadbalancers: '0'
+  # Made by HyperShift and the Agent reclaim during the 2026-11-20 scale-down
+  # and reinstall: the in-place upgrade namespace and the reclaim config.
+  # Quota only; the in-place upgrade's pods run here during a NodePool roll.
+  compliant-dev-workload0-hypervisor-upgrade:
+    quota: *smallQuota
+  assisted-installer:
+    quota: *smallQuota
