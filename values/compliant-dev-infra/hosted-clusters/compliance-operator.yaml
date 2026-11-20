@@ -31,6 +31,11 @@ scanSetting:
   rawResultStorage:
     enabled: true
     storageClassName: pure-fb-nfsv4
+    # The operator's default puts the result server on a master, and a
+    # hosted cluster has none.
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+    tolerations: []
 
 _rationale:
   kas: &kas "Hosted control plane: the kube-apiserver runs on the hub, and its configuration is not visible in the cluster. Checked on the hub (kas-config and the kube-apiserver deployment in clusters-<cluster>, 2026-10-22): admission plugins NamespaceLifecycle, NodeRestriction, ServiceAccount and the SCC plugins enabled; authorization-mode includes RBAC and Node; serving on 0.0.0.0:6443 with its own certificate and key; client CA, etcd CA and client certificate, kubelet CA and client certificate set; service-account lookup on and public key file set; min-request-timeout 3600; secrets encrypted with aescbc."
