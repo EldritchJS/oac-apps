@@ -26,10 +26,11 @@ monitoring:
 scanSetting:
   # No masters: the control plane is on the hub.
   roles: [worker]
-  # No StorageClass until Portworx. Results are kept as
-  # ComplianceCheckResult objects; only the raw ARF files are skipped.
+  # Raw ARF results are the evidence archive (T-04), on the FlashBlade
+  # over NFS with TLS (oac-apps #269), as on the hub.
   rawResultStorage:
-    enabled: false
+    enabled: true
+    storageClassName: pure-fb-nfsv4
 
 _rationale:
   kas: &kas "Hosted control plane: the kube-apiserver runs on the hub, and its configuration is not visible in the cluster. Checked on the hub (kas-config and the kube-apiserver deployment in clusters-<cluster>, 2026-10-22): admission plugins NamespaceLifecycle, NodeRestriction, ServiceAccount and the SCC plugins enabled; authorization-mode includes RBAC and Node; serving on 0.0.0.0:6443 with its own certificate and key; client CA, etcd CA and client certificate, kubelet CA and client certificate set; service-account lookup on and public key file set; min-request-timeout 3600; secrets encrypted with aescbc."
