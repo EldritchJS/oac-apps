@@ -17,6 +17,20 @@ namespaces:
     ingress: {}
     egress: {}
     quota: *smallQuota
+  # As on the hub: the operator's webhook on 9443, which the API server
+  # reaches through the konnectivity agent on the host network.
+  patch-operator:
+    ingress:
+      hostNetworkPorts: [9443]
+    egress:
+      apiAndDns: true
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
   # HyperShift runs the NodePool's in-place upgrade pods in
   # compliant-dev-workload0-hypervisor-upgrade during a rollout, and the
   # namespace exists only then. Not listed until one has run: a policy
