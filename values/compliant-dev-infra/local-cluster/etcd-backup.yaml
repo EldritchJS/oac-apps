@@ -4,3 +4,6 @@ image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dd774d7a11bb59a6500
 storage:
   # "" = the default StorageClass; set when the hub has one.
   storageClassName: ""
+# Hosted clusters' etcd runs on this hub: back each one up (MOC-issues #787).
+hostedClusters:
+  - name: compliant-dev-workload0

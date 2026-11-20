@@ -16,10 +16,14 @@
 namespaces:
   etcd-backup:
     ingress: {}
-    egress: {}
+    # The hub's own backup runs on the host network; the hosted clusters'
+    # backups exec into their etcd pods through the API server.
+    egress:
+      apiAndDns: true
     quota:
       pods: '4'
-      persistentvolumeclaims: '2'
+      # The hub's volume and one per hosted cluster.
+      persistentvolumeclaims: '4'
       requests.storage: 50Gi
       services: '0'
       services.nodeports: '0'
