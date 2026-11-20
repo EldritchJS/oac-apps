@@ -34,6 +34,7 @@ scanSetting:
     # The operator's default puts the result server on a master, and a
     # hosted cluster has none.
     nodeSelector:
+      node-role.kubernetes.io/master: null
       node-role.kubernetes.io/worker: ""
     tolerations: []
 
