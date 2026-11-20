@@ -17,9 +17,8 @@ namespaces:
     ingress: {}
     egress: {}
     quota: *smallQuota
-  # HyperShift runs the NodePool's in-place upgrade pods here during a
-  # rollout. Ingress only: nothing calls them, and their egress was not
-  # measured (no rollout since ACS arrived).
-  compliant-dev-workload0-compute-upgrade:
-    ingress: {}
-    quota: *smallQuota
+  # HyperShift runs the NodePool's in-place upgrade pods in
+  # compliant-dev-workload0-hypervisor-upgrade during a rollout, and the
+  # namespace exists only then. Not listed until one has run: a policy
+  # for a missing namespace fails the whole sync. On nist-dev-workload0
+  # (NodePool "compute") it took ingress {} and smallQuota.
