@@ -36,3 +36,32 @@ namespaces:
   # namespace exists only then. Not listed until one has run: a policy
   # for a missing namespace fails the whole sync. On nist-dev-workload0
   # (NodePool "compute") it took ingress {} and smallQuota.
+  # Storage (oac-apps #269), sized as on the hub. tlshd is host-network,
+  # so default-deny both ways costs it nothing. portworx and
+  # object-storage-proxy get quota only until their traffic is measured.
+  nfs-tls:
+    ingress: {}
+    egress: {}
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  portworx:
+    quota:
+      pods: '15'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '10'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
+  object-storage-proxy:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
