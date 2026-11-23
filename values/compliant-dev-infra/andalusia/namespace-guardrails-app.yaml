@@ -1,0 +1,9 @@
+# andalusia lacks two of the namespaces the hosted-cluster list covers, and
+# a quota for a missing namespace fails the sync's first wave, so the
+# default-deny policies in the next wave never apply.
+namespaces:
+  # No MetalLB here: andalusia's ingress address is on workload0.
+  metallb-system: null
+  # Not yet: external-secrets comes with oac-apps #281. Remove this line
+  # once the namespace exists.
+  external-secrets: null
