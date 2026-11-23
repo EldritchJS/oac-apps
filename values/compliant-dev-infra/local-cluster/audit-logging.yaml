@@ -31,3 +31,4 @@ loki:
 auditWriters:
   clusters:
     - compliant-dev-workload0
+    - andalusia

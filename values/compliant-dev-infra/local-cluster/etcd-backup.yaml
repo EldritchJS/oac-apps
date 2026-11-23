@@ -7,3 +7,4 @@ storage:
 # Hosted clusters' etcd runs on this hub: back each one up (MOC-issues #787).
 hostedClusters:
   - name: compliant-dev-workload0
+  - name: andalusia
