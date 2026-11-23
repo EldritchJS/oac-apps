@@ -1,4 +1,6 @@
 {{- range $ns, $c := .Values.namespaces }}
+{{- /* A namespace set to null in a cluster's values is left out. */}}
+{{- if $c }}
 {{- with $c.quota }}
 ---
 apiVersion: v1
@@ -143,5 +145,6 @@ metadata:
   namespace: {{ $ns }}
 spec:
   {{- toYaml .spec | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}
