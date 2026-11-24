@@ -54,3 +54,16 @@ imageConfig:
 # certificates.api disabled on this hub (oac-apps #184).
 apiServerAudit:
   enabled: true
+
+# Route rate limits on the hub and workload0 (replaces route-rate-limits.sh;
+# the hub's clusters-andalusia routes from 2026-11-23 had none). The hub
+# tailors route-ip-whitelist out (compliance-operator values, routeNetwork);
+# workload0 keeps it, and its only route outside openshift-* is HyperShift's
+# wildcard passthrough route for andalusia, which its router does not admit,
+# so the allowlist is the VPN-reachable 10.20.0.0/16.
+routeAnnotations:
+  enabled: true
+  rateLimit:
+    clusters: [local-cluster, compliant-dev-workload0]
+  ipAllowlists:
+    compliant-dev-workload0: 10.20.0.0/16
