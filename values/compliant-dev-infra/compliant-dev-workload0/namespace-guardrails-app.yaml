@@ -89,3 +89,17 @@ namespaces:
       services: '5'
       services.nodeports: '0'
       services.loadbalancers: '0'
+  # andalusia's VM (MOC-issues #788). HyperShift and kubevirt-csi make
+  # everything here: the VM's launcher and hot-plug pods, its root disk,
+  # one PVC per guest PVC (10 on 2026-11-24, about 790Gi), and the mirrored
+  # guest-router LoadBalancer, whose two node ports count against the quota.
+  # HyperShift's virt-launcher NetworkPolicy is already here, so quota only.
+  # Room for a Replace roll (two launchers) and the guest's PVCs to grow.
+  clusters-andalusia:
+    quota:
+      pods: '20'
+      persistentvolumeclaims: '50'
+      requests.storage: 4Ti
+      services: '5'
+      services.nodeports: '4'
+      services.loadbalancers: '2'
