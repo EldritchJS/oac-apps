@@ -66,4 +66,6 @@ routeAnnotations:
   rateLimit:
     clusters: [local-cluster, compliant-dev-workload0]
   ipAllowlists:
-    compliant-dev-workload0: 10.20.0.0/16
+    vpn:
+      clusters: [compliant-dev-workload0]
+      cidrs: 10.20.0.0/16

@@ -76,5 +76,10 @@ routeAnnotations:
     clusters: []
     concurrentTcp: 100
     rateTcp: 100
-  # cluster name -> space-separated CIDRs
+  # Named groups, each a policy route-allowlist-<group>. ACM limits the
+  # policy namespace plus name to 62 characters, so keep the group short.
+  #   ipAllowlists:
+  #     vpn:
+  #       clusters: [compliant-dev-workload0]
+  #       cidrs: 10.20.0.0/16        # space-separated
   ipAllowlists: {}
