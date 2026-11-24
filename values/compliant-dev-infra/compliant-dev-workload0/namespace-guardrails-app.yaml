@@ -103,3 +103,13 @@ namespaces:
       services: '5'
       services.nodeports: '4'
       services.loadbalancers: '2'
+  # The COSI controller (pure-cosi, 2026-11-23), sized as on the hub: one
+  # pod, no services or volumes of its own. Quota only, as on the hub.
+  container-object-storage-system:
+    quota:
+      pods: '10'
+      persistentvolumeclaims: '2'
+      requests.storage: 20Gi
+      services: '5'
+      services.nodeports: '0'
+      services.loadbalancers: '0'
