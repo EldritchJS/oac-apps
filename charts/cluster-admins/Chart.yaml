@@ -1,0 +1,5 @@
+apiVersion: v2
+name: cluster-admins
+description: Bind cluster-admin to identity provider groups
+version: 0.1.0
+type: application

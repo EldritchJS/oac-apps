@@ -1,0 +1,8 @@
+# Groups bound to cluster-admin. With the OpenID groups claim, OpenShift
+# creates these groups at login from the identity provider's, so whoever
+# manages membership there grants cluster-admin here. Name groups that
+# exist for this cluster alone.
+#
+# This is what lets a cluster drop kubeadmin (ocp4 kubeadmin-removed): an
+# SSO administrator must exist before the kubeadmin secret is deleted.
+groups: []
